@@ -1,0 +1,13 @@
+[package]
+name = "secure_comm_lib"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "secure_comm_lib"
+crate-type = ["cdylib"]
+
+[dependencies]
+jni = "0.21.1"
+reqwest = { version = "0.12", features = ["json"] }
+tokio = { version = "1", features = ["full"] }
