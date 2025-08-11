@@ -3,18 +3,10 @@ use jni::objects::{JClass, JString};
 use jni::sys::jstring;
 use tokio::runtime::Runtime;
 
-#[unsafe(no_mangle)]
-pub extern "system" fn Java_Main_hello<'a>(
-    mut env: JNIEnv<'a>,
-    _class: JClass<'a>,
-) -> jstring {
-    let output = env
-        .new_string("Connection successful!")
-        .expect("Couldn't create Java string!");
-    output.into_raw()
+pub mod hello {
+    tonic::include_proto!("hello"); // package hello from hello.proto
 }
 
-// Our new generic function for making different types of HTTP requests
 #[unsafe(no_mangle)]
 pub extern "system" fn Java_Main_makeHttpRequestGeneric<'a>(
     mut env: JNIEnv<'a>,
@@ -23,7 +15,6 @@ pub extern "system" fn Java_Main_makeHttpRequestGeneric<'a>(
     java_url: JString<'a>,
     java_body: JString<'a>,
 ) -> jstring {
-    // Convert Java strings to Rust strings
     let method: String = env.get_string(&java_method).expect("Couldn't get method string").into();
     let url: String = env.get_string(&java_url).expect("Couldn't get url string").into();
     let body: String = env.get_string(&java_body).expect("Couldn't get body string").into();
@@ -37,7 +28,7 @@ pub extern "system" fn Java_Main_makeHttpRequestGeneric<'a>(
             "POST" => client.post(&url).header("Content-Type", "application/json").body(body).send().await,
             "PUT" => client.put(&url).header("Content-Type", "application/json").body(body).send().await,
             "DELETE" => client.delete(&url).send().await,
-            _ => return "Unsupported HTTP method".to_string(), // Handle unsupported methods
+            _ => return "Unsupported HTTP method".to_string(),
         };
 
         match result {
@@ -49,5 +40,47 @@ pub extern "system" fn Java_Main_makeHttpRequestGeneric<'a>(
     let output = env
         .new_string(response_body)
         .expect("Couldn't create Java string!");
+    output.into_raw()
+}
+
+#[unsafe(no_mangle)]
+pub extern "system" fn Java_Main_makeGrpcRequest<'a>(
+    mut env: JNIEnv<'a>,
+    _class: JClass<'a>,
+    java_greeting: JString<'a>,
+) -> jstring {
+    let greeting: String = env.get_string(&java_greeting).expect("Couldn't get greeting").into();
+
+    let rt = Runtime::new().expect("Failed to create Tokio runtime");
+
+    let response_message = rt.block_on(async {
+        // TLS for grpcb.in
+        let tls = tonic::transport::ClientTlsConfig::new()
+            .domain_name("grpcb.in");
+
+        let channel = tonic::transport::Channel::from_static("https://grpcb.in:9001")
+            .tls_config(tls)
+            .expect("TLS config failed")
+            .connect()
+            .await;
+
+        match channel {
+            Ok(channel) => {
+                let mut client = hello::hello_service_client::HelloServiceClient::new(channel);
+
+                let request = tonic::Request::new(hello::HelloRequest {
+                    greeting: Some(greeting.clone()), // proto2 optional
+                });
+
+                match client.say_hello(request).await {
+                    Ok(response) => response.into_inner().reply,
+                    Err(e) => format!("gRPC call failed: {}", e),
+                }
+            }
+            Err(e) => format!("Failed to connect: {}", e),
+        }
+    });
+
+    let output = env.new_string(response_message).expect("Couldn't create Java string!");
     output.into_raw()
 }

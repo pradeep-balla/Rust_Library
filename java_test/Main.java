@@ -1,4 +1,3 @@
-
 public class Main {
     static {
         // Using the absolute path to load the library
@@ -6,11 +5,11 @@ public class Main {
         System.load(libraryPath);
     }
 
-    // Previous native methods
-    private native String hello();
-
-    // The new generic native method
+    // Native method for generic HTTP requests
     private native String makeHttpRequestGeneric(String method, String url, String body);
+
+    // Native method for HelloService gRPC request
+    private native String makeGrpcRequest(String name);
 
     public static void main(String[] args) {
         Main app = new Main();
@@ -19,7 +18,7 @@ public class Main {
 
         // --- GET Request ---
         System.out.println("\n--- Making GET Request ---");
-        response = app.makeHttpRequestGeneric("GET", "http://httpbin.org/get", ""); // Body is empty for GET
+        response = app.makeHttpRequestGeneric("GET", "http://httpbin.org/get", "");
         System.out.println(response);
 
         // --- POST Request ---
@@ -34,7 +33,12 @@ public class Main {
 
         // --- DELETE Request ---
         System.out.println("\n--- Making DELETE Request ---");
-        response = app.makeHttpRequestGeneric("DELETE", "http://httpbin.org/delete", ""); // Body is empty for DELETE
+        response = app.makeHttpRequestGeneric("DELETE", "http://httpbin.org/delete", "");
         System.out.println(response);
+
+        // --- gRPC HelloService Request ---
+        System.out.println("\n--- Making gRPC HelloService Request from Rust ---");
+        response = app.makeGrpcRequest("Pradeep");
+        System.out.println("gRPC Response: " + response);
     }
 }
