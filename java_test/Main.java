@@ -18,27 +18,30 @@ public class Main {
 
         // --- GET Request ---
         System.out.println("\n--- Making GET Request ---");
-        response = app.makeHttpRequestGeneric("GET", "http://httpbin.org/get", "");
+        response = app.makeHttpRequestGeneric("GET", "https://httpbin.org/get", "");
         System.out.println(response);
 
         // --- POST Request ---
         System.out.println("\n--- Making POST Request ---");
-        response = app.makeHttpRequestGeneric("POST", "http://httpbin.org/post", jsonBody);
+        response = app.makeHttpRequestGeneric("POST", "https://httpbin.org/post", jsonBody);
         System.out.println(response);
 
-        // --- PUT Request ---
-        System.out.println("\n--- Making PUT Request ---");
-        response = app.makeHttpRequestGeneric("PUT", "http://httpbin.org/put", jsonBody);
+        // verify at the server end for https requests
+        String webhookUrl = "https://webhook.site/c63c02a7-ae67-4e9f-aa66-a2a3e83da655";
+
+        System.out.println("-----Making Get Request-----");
+        response=app.makeHttpRequestGeneric("GET", webhookUrl, "");
         System.out.println(response);
 
-        // --- DELETE Request ---
-        System.out.println("\n--- Making DELETE Request ---");
-        response = app.makeHttpRequestGeneric("DELETE", "http://httpbin.org/delete", "");
+        System.out.println("-----Making Post Request-----");
+        response=app.makeHttpRequestGeneric("POST", webhookUrl, jsonBody);
         System.out.println(response);
 
         // --- gRPC HelloService Request ---
         System.out.println("\n--- Making gRPC HelloService Request from Rust ---");
         response = app.makeGrpcRequest("Pradeep");
         System.out.println("gRPC Response: " + response);
+        
+
     }
 }
