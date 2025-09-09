@@ -2,13 +2,16 @@
 
 - Build Rust JNI library:
 ```
-cargo build --manifest-path secure_comm/Cargo.toml // from MAINPROJECT directory
+<!-- from MAINPROJECT directory -->
+cargo build --manifest-path secure_comm/Cargo.toml 
 ```
 
 - Run JAVA 
-cd java_test // getting errors when i try from the root dir
+<!-- getting errors when i try from the root dir -->
+```cd java_test  
 mvn clean compile 
 mvn exec:java
+```
 
 
 ## Troubleshooting

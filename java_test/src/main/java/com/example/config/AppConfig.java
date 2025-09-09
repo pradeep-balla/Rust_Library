@@ -38,7 +38,7 @@ public class AppConfig {
         properties.setProperty("person.json.path", "../data/person.json");
         properties.setProperty("signature.output.path", "../output/signature.sig.b64");
         properties.setProperty("cert.thumbprint", "472F5B392D52BB109345DA5BD6649E3AE0AE91E0");
-        properties.setProperty("webhook.url", "https://webhook.site/809b6fdc-f7c2-459f-9739-0fe9a22abb5f");
+        properties.setProperty("webhook.url", "http://localhost:8080/");
     }
     
     public String getPersonJsonPath() {
@@ -54,6 +54,6 @@ public class AppConfig {
     }
     
     public String getWebhookUrl() {
-        return properties.getProperty("webhook.url", "https://webhook.site/809b6fdc-f7c2-459f-9739-0fe9a22abb5f");
+        return properties.getProperty("webhook.url", "http://localhost:8080/");
     }
 }

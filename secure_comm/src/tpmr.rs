@@ -1,23 +1,22 @@
 use base64::{engine::general_purpose::STANDARD as BASE64, Engine as _};
-use openssl::hash::MessageDigest;
-use openssl::pkey::PKey;
-use openssl::sign::Verifier;
-use openssl::x509::X509;
 use sha2::{Digest, Sha256};
 use std::ffi::c_void;
 use std::fs;
 use windows_sys::Win32::Foundation::BOOL;
 use windows_sys::Win32::Security::Cryptography::*;
 
-pub(crate) fn sign_json_with_tpm_and_verify(//visible only inside this crate
-    json_path: &str,
+
+pub(crate) fn sign_json_with_tpm(//visible only inside this crate
+    //json_path: &str,
+    json_bytes: &[u8],
     cert_thumbprint_hex: &str,
     out_sig_b64_path: &str,
-) -> Result<(String, bool), Box<dyn std::error::Error>> {
+) -> Result<String, Box<dyn std::error::Error>> {
     // Read payload and hash
-    let payload = fs::read(json_path)?;
+    //let payload = fs::read(json_path)?;
     let mut hasher = Sha256::new();
-    hasher.update(&payload);
+    //hasher.update(&payload);
+    hasher.update(json_bytes);
     let digest = hasher.finalize();
 
     // Open CurrentUser\\My store
@@ -90,12 +89,6 @@ pub(crate) fn sign_json_with_tpm_and_verify(//visible only inside this crate
     let sig_b64 = BASE64.encode(&sig);
     fs::write(out_sig_b64_path, &sig_b64)?;
 
-    // Verify using in-memory cert DER
-    let cert_der: &[u8] = unsafe {
-        std::slice::from_raw_parts((*found_ctx).pbCertEncoded, (*found_ctx).cbCertEncoded as usize)
-    };
-    let verified = verify_with_der_pkcs1_sha256(cert_der, &payload, &sig)?;
-
     // Cleanup
     unsafe {
         if must_free != 0 { let _ = NCryptFreeObject(ph_key); }
@@ -103,16 +96,7 @@ pub(crate) fn sign_json_with_tpm_and_verify(//visible only inside this crate
         let _ = CertCloseStore(h_store, 0);
     }
 
-    Ok((sig_b64, verified))
-}
-
-fn verify_with_der_pkcs1_sha256(cert_der: &[u8], payload: &[u8], signature: &[u8]) -> Result<bool, Box<dyn std::error::Error>> {
-    let cert = X509::from_der(cert_der)?;
-    let pkey: PKey<openssl::pkey::Public> = cert.public_key()?;
-    let mut verifier = Verifier::new(MessageDigest::sha256(), &pkey)?;
-    verifier.update(payload)?;
-    let ok = verifier.verify(signature)?;
-    Ok(ok)
+    Ok(sig_b64)
 }
 
 fn hex_to_bytes(hex: &str) -> Option<Vec<u8>> {
@@ -130,5 +114,3 @@ fn wide(s: &str) -> Vec<u16> {
     use std::os::windows::ffi::OsStrExt;
     std::ffi::OsStr::new(s).encode_wide().chain(std::iter::once(0)).collect()
 }
-
-

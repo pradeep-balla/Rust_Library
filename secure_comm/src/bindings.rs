@@ -2,7 +2,7 @@ use jni::JNIEnv;
 use jni::objects::{JClass, JString};
 use jni::sys::jstring;
 
-use crate::tpmr::sign_json_with_tpm_and_verify;
+use crate::tpmr::sign_json_with_tpm;
 use crate::https_client::make_http_request;
 use crate::grpc_client::make_grpc_request;
 use crate::config::Config;
@@ -29,8 +29,9 @@ pub extern "system" fn Java_com_example_Main_makeHttpRequestGeneric<'a>(
     };
 
     // TPM signing
-    let (signature_b64, _verified) = match sign_json_with_tpm_and_verify(
-        config.get_person_json_path(),
+    let signature_b64 = match sign_json_with_tpm(
+        //config.get_person_json_path(),
+        body.as_bytes(),
         config.get_cert_thumbprint(),
         config.get_signature_output_path(),
     ) {

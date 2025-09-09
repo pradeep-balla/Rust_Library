@@ -39,6 +39,7 @@ public class Main {
 
         // Make POST request to webhook
         String webhookUrl = config.getWebhookUrl();
+        //String webhookUrl = "http://localhost:8080/";
         System.out.println("----- Making POST Request to: " + webhookUrl + " -----");
         
         try {
