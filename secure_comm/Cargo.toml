@@ -16,7 +16,8 @@ tonic = { version = "0.11.0", features = ["tls", "tls-roots"] }
 windows-sys = { version = "0.59", features = [
   "Win32_Foundation",
   "Win32_Security_Cryptography",
-  "Win32_Security_Cryptography_Certificates"
+  "Win32_Security_Cryptography_Certificates",
+  "Win32_System_TpmBaseServices"   # <- add this
 ] }
 sha2 = "0.10"
 base64 = "0.22"

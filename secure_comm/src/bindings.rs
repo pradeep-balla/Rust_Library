@@ -6,6 +6,7 @@ use crate::tpmr::sign_json_with_tpm;
 use crate::https_client::make_http_request;
 use crate::grpc_client::make_grpc_request;
 use crate::config::Config;
+use crate::versionCheck::is_tpm2;
 
 #[no_mangle]
 pub extern "system" fn Java_com_example_Main_makeHttpRequestGeneric<'a>(
@@ -28,27 +29,31 @@ pub extern "system" fn Java_com_example_Main_makeHttpRequestGeneric<'a>(
         }
     };
 
-    // TPM signing
-    let signature_b64 = match sign_json_with_tpm(
-        //config.get_person_json_path(),
-        body.as_bytes(),
-        config.get_cert_thumbprint(),
-        config.get_signature_output_path(),
-    ) {
-        Ok(v) => v,
-        Err(e) => {
-            let s = env.new_string(format!("TPM signing failed: {}", e)).unwrap();
-            return s.into_raw();
-        }
-    };
+    let response_body = if is_tpm2() {
+        // TPM 2.0 → sign and send signature + thumbprint
+        let signature_b64 = match sign_json_with_tpm(
+            body.as_bytes(),
+            config.get_cert_thumbprint(),
+            config.get_signature_output_path(),
+        ) {
+            Ok(sig) => sig,
+            Err(e) => {
+                let s = env.new_string(format!("TPM signing failed: {}", e)).unwrap();
+                return s.into_raw();
+            }
+        };
 
-    let response_body = make_http_request(
-        method,
-        url,
-        body,
-        signature_b64,
-        config.get_cert_thumbprint(),
-    );
+        make_http_request(
+            method,
+            url,
+            body,
+            Some(signature_b64),
+            Some(config.get_cert_thumbprint()),
+        )
+    } else {
+        // TPM < 2.0 → skip signing and thumbprint
+        make_http_request(method, url, body, None, None)
+    };
 
     let output = env
         .new_string(response_body)
