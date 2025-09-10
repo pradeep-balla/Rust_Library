@@ -19,7 +19,7 @@ public class Main {
     private native String makeHttpRequestGeneric(String method, String url, String body);
 
     // Native method for HelloService gRPC request
-    //private native String makeGrpcRequest(String name);
+    public native String makeGrpcRequest(String json, String serverUrl);
 
     public static void main(String[] args) {
         Main app = new Main();
@@ -50,14 +50,10 @@ public class Main {
         }
 
         // Uncomment to test gRPC request
-        /*
-        System.out.println("\n----- Making gRPC Request -----");
-        try {
-            String grpcResponse = app.makeGrpcRequest("Pradeep");
-            System.out.println("gRPC Response: " + grpcResponse);
-        } catch (Exception e) {
-            System.err.println("Error making gRPC request: " + e.getMessage());
-        }
-        */
+        String serverUrl = "http://localhost:50051"; // e.g. "http://localhost:50051"
+        // String serverUrl = config.getGrpcServerUrl();
+        String grpcResponse = app.makeGrpcRequest(jsonBody, serverUrl);
+        System.out.println("gRPC Response: " + grpcResponse);
+
     }
 }

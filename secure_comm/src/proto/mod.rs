@@ -1,1 +1,1 @@
-tonic::include_proto!("hello"); // package hello
+pub mod verifier { tonic::include_proto!("verifier"); }

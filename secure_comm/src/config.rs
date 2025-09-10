@@ -12,7 +12,8 @@ pub struct Config {
 impl Config {
     pub fn new() -> Result<Self, Box<dyn std::error::Error>> {
         // Try to load from environment properties file first
-        let config_path = Path::new("config/environment.properties");
+        // Load config only from secure_comm/config to keep TPM/signature settings encapsulated
+        let config_path = Path::new("secure_comm/config/environment.properties");
         let mut config = Config {
             cert_thumbprint: "472F5B392D52BB109345DA5BD6649E3AE0AE91E0".to_string(),
             //person_json_path: "data/person.json".to_string(),

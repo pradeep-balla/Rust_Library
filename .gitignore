@@ -1,27 +1,24 @@
-# Output files
-output/
-logs/
-
-# Configuration files with sensitive data
-config/environment.properties
-
 # Build artifacts
-target/
-*.exe
-*.dll
-*.so
-*.dylib
+secure_comm/target/
+java_test/target/
+java_test/build/
+server/**/target/
 
-# IDE files
+# Logs and outputs
+logs/
+output/
+*.log
+
+# Native build outputs
+*.dll
+*.lib
+*.exp
+*.pdb
+
+# Signatures and generated files
+*.sig
+
+# IDE/editor
 .vscode/
 .idea/
-*.swp
-*.swo
-
-# OS files
 .DS_Store
-Thumbs.db
-
-# Temporary files
-*.tmp
-*.temp

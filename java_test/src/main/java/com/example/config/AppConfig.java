@@ -36,8 +36,6 @@ public class AppConfig {
     
     private void setDefaultProperties() {
         properties.setProperty("person.json.path", "../data/person.json");
-        properties.setProperty("signature.output.path", "../output/signature.sig.b64");
-        properties.setProperty("cert.thumbprint", "472F5B392D52BB109345DA5BD6649E3AE0AE91E0");
         properties.setProperty("webhook.url", "http://localhost:8080/");
     }
     
@@ -45,13 +43,7 @@ public class AppConfig {
         return properties.getProperty("person.json.path", "../data/person.json");
     }
     
-    public String getSignatureOutputPath() {
-        return properties.getProperty("signature.output.path", "../output/signature.sig.b64");
-    }
-    
-    public String getCertThumbprint() {
-        return properties.getProperty("cert.thumbprint", "472F5B392D52BB109345DA5BD6649E3AE0AE91E0");
-    }
+    // TPM/signature settings are encapsulated on Rust side (secure_comm)
     
     public String getWebhookUrl() {
         return properties.getProperty("webhook.url", "http://localhost:8080/");

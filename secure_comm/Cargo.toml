@@ -12,7 +12,7 @@ jni = "0.21.1"
 reqwest = { version = "0.12", features = ["json"] }
 tokio = { version = "1", features = ["full"] }
 prost = "0.12.3"
-tonic = { version = "0.11.0", features = ["tls", "tls-roots"] }
+tonic = { version = "0.11.0", features = ["transport", "tls", "tls-roots"] }
 windows-sys = { version = "0.59", features = [
   "Win32_Foundation",
   "Win32_Security_Cryptography",
@@ -21,8 +21,8 @@ windows-sys = { version = "0.59", features = [
 ] }
 sha2 = "0.10"
 base64 = "0.22"
-openssl = { version = "0.10", features = ["vendored"] }
 
 [build-dependencies]
 tonic-build = "0.11.0"
+protoc-bin-vendored = "3"
 

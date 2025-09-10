@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package verifier;
+
+// Where the generated Go files will go
+option go_package = "go_grpc_server/proto/verifier;verifier";
+
+service Verifier {
+  // We only send the payload as bytes; signature + thumbprint are metadata headers.
+  rpc Verify (PayloadBytes) returns (VerifyResponse);
+}
+
+message PayloadBytes {
+  bytes data = 1; // JSON or any other binary payload
+}
+
+message VerifyResponse {
+  string result = 1; // Server's response
+}
